@@ -296,16 +296,66 @@ const HEADSHOT_MULTIPLIER = 3;
 const BULLET_RANGE = 200;
 
 const ENEMY_TYPES = {
-  grunt:  { name: '小兵',   color: 0xcc3333, hp: 30, speed: 4,  damage: 8,  fireRate: 1.5, range: 25, points: 100, scale: 1.0 },
-  runner: { name: '快跑者', color: 0xff8800, hp: 20, speed: 8,  damage: 6,  fireRate: 0.8, range: 20, points: 150, scale: 0.85 },
-  tank:   { name: '重装兵', color: 0x8833cc, hp: 80, speed: 2.5, damage: 15, fireRate: 2.0, range: 35, points: 300, scale: 1.4 },
-  sniper: { name: '狙击手', color: 0x226644, hp: 25, speed: 3,  damage: 22, fireRate: 2.8, range: 55, points: 250, scale: 0.95 },
-  medic:  { name: '医疗兵', color: 0xddeeff, hp: 35, speed: 4.5, damage: 0,  fireRate: 999, range: 30, points: 200, scale: 0.9 },
-  shield: { name: '重盾兵', color: 0x667788, hp: 75, speed: 2.8, damage: 10, fireRate: 1.8, range: 22, points: 350, scale: 1.25 },
-  bomber: { name: '自爆兵', color: 0xccaa00, hp: 15, speed: 9,  damage: 30, fireRate: 999, range: 8,  points: 180, scale: 0.8  },
-  ghost:  { name: '幽灵',   color: 0x88ccdd, hp: 28, speed: 5,  damage: 20, fireRate: 1.8, range: 18, points: 280, scale: 0.9  },
-  turret: { name: '炮塔',   color: 0x555555, hp: 40, speed: 0,  damage: 10, fireRate: 0.4, range: 40, points: 200, scale: 1.0  },
-};
+  // ── 第一梯队：基础步兵 (红/棕系) ──
+  grunt:      { name:'小兵',     color:0xcc3333, hp:30, speed:4,   damage:8,  fireRate:1.5, range:25, points:100, scale:1.0 },
+  rifleman:   { name:'步枪兵',   color:0xcc4444, hp:32, speed:3.8, damage:9,  fireRate:1.4, range:28, points:110, scale:1.0 },
+  trooper:    { name:'突击兵',   color:0xbb3322, hp:28, speed:4.2, damage:7,  fireRate:1.6, range:22, points:105, scale:0.95 },
+  scout:      { name:'侦察兵',   color:0xdd5533, hp:22, speed:5.5, damage:5,  fireRate:1.3, range:30, points:120, scale:0.9 },
+  marauder:   { name:'掠夺者',   color:0xaa4422, hp:35, speed:3.5, damage:10, fireRate:1.7, range:20, points:115, scale:1.05 },
+  bandit:     { name:'土匪',     color:0x995533, hp:25, speed:4.5, damage:7,  fireRate:1.2, range:22, points:100, scale:0.9 },
+  militant:   { name:'武装兵',   color:0xcc5533, hp:33, speed:3.8, damage:8,  fireRate:1.5, range:26, points:110, scale:1.0 },
+  raider:     { name:'劫掠者',   color:0xbb4422, hp:26, speed:5,   damage:6,  fireRate:1.4, range:24, points:105, scale:0.9 },
+  prowler:    { name:'潜行者',   color:0xaa3322, hp:24, speed:5.2, damage:6,  fireRate:1.3, range:28, points:115, scale:0.88 },
+  enforcer:   { name:'执法者',   color:0xcc4422, hp:36, speed:3.5, damage:9,  fireRate:1.6, range:23, points:120, scale:1.05 },
+
+  // ── 第二梯队：高速兵种 (橙/黄系) ──
+  runner:     { name:'快跑者',   color:0xff8800, hp:20, speed:8,   damage:6,  fireRate:0.8, range:20, points:150, scale:0.85 },
+  sprinter:   { name:'疾跑者',   color:0xff9900, hp:18, speed:9,   damage:5,  fireRate:0.7, range:18, points:155, scale:0.8 },
+  dasher:     { name:'猛冲者',   color:0xff7700, hp:22, speed:7.5, damage:7,  fireRate:0.9, range:22, points:145, scale:0.85 },
+  skirmisher: { name:'游击兵',   color:0xffaa22, hp:24, speed:7,   damage:6,  fireRate:0.8, range:25, points:140, scale:0.9 },
+  flanker:    { name:'侧袭者',   color:0xff8833, hp:19, speed:8.5, damage:5,  fireRate:0.75,range:19, points:155, scale:0.82 },
+  charger:    { name:'冲锋兵',   color:0xee9922, hp:26, speed:6.5, damage:8,  fireRate:1.0, range:21, points:135, scale:0.9 },
+  slasher:    { name:'斩击者',   color:0xff7722, hp:21, speed:7.8, damage:7,  fireRate:0.85,range:18, points:150, scale:0.84 },
+  ambusher:   { name:'伏击者',   color:0xee8811, hp:17, speed:9.2, damage:4,  fireRate:0.6, range:17, points:160, scale:0.78 },
+  hunter:     { name:'猎手',     color:0xff9933, hp:23, speed:7,   damage:6,  fireRate:0.9, range:24, points:140, scale:0.88 },
+  stalker:    { name:'追踪者',   color:0xee8822, hp:25, speed:6.8, damage:7,  fireRate:0.95,range:23, points:145, scale:0.9 },
+
+  // ── 第三梯队：重装/坦克 (紫/粉系) ──
+  tank:       { name:'重装兵',   color:0x8833cc, hp:80, speed:2.5, damage:15, fireRate:2.0, range:35, points:300, scale:1.4 },
+  juggernaut: { name:'主宰',     color:0x9933dd, hp:90, speed:2.2, damage:18, fireRate:2.2, range:33, points:330, scale:1.45 },
+  titan:      { name:'泰坦',     color:0x8822bb, hp:100, speed:2,  damage:20, fireRate:2.5, range:30, points:360, scale:1.5 },
+  behemoth:   { name:'巨兽',     color:0x7733aa, hp:85, speed:2.3, damage:16, fireRate:2.1, range:34, points:320, scale:1.42 },
+  colossus:   { name:'巨像',     color:0x9944cc, hp:95, speed:1.8, damage:19, fireRate:2.3, range:32, points:350, scale:1.48 },
+  destroyer:  { name:'毁灭者',   color:0x8822cc, hp:88, speed:2.4, damage:17, fireRate:1.9, range:36, points:340, scale:1.4 },
+  annihilator:{ name:'歼灭者',   color:0x7722cc, hp:82, speed:2.6, damage:14, fireRate:1.8, range:38, points:310, scale:1.38 },
+  devastator: { name:'破坏者',   color:0x8844dd, hp:78, speed:2.7, damage:13, fireRate:1.7, range:40, points:300, scale:1.35 },
+  warmonger:  { name:'战争狂',   color:0x9933cc, hp:86, speed:2.5, damage:16, fireRate:2.0, range:35, points:325, scale:1.4 },
+  overlord:   { name:'霸王',     color:0x8822dd, hp:92, speed:2.1, damage:21, fireRate:2.4, range:31, points:370, scale:1.5 },
+
+  // ── 第四梯队：远程/狙击 (绿/青系) ──
+  sniper:     { name:'狙击手',   color:0x226644, hp:25, speed:3,   damage:22, fireRate:2.8, range:55, points:250, scale:0.95 },
+  marksman:   { name:'神射手',   color:0x228844, hp:23, speed:3.2, damage:20, fireRate:2.5, range:52, points:240, scale:0.93 },
+  sharpshooter:{ name:'精确射手',color:0x337755, hp:27, speed:2.8, damage:24, fireRate:3.0, range:58, points:260, scale:0.97 },
+  deadeye:    { name:'死神之眼', color:0x228866, hp:20, speed:3.5, damage:26, fireRate:3.2, range:60, points:280, scale:0.9 },
+  ranger:     { name:'游侠',     color:0x336633, hp:28, speed:3.3, damage:18, fireRate:2.4, range:50, points:230, scale:0.95 },
+  archer:     { name:'弓手',     color:0x337744, hp:22, speed:3.8, damage:16, fireRate:2.2, range:48, points:220, scale:0.9 },
+  sentinel:   { name:'哨兵',     color:0x226633, hp:30, speed:2.5, damage:21, fireRate:2.6, range:54, points:245, scale:1.0 },
+  watcher:    { name:'守望者',   color:0x227755, hp:26, speed:3,   damage:19, fireRate:2.3, range:56, points:235, scale:0.94 },
+  gunslinger: { name:'快枪手',   color:0x338844, hp:21, speed:4,   damage:15, fireRate:1.8, range:45, points:210, scale:0.88 },
+  deadeye2:   { name:'鹰眼',     color:0x228855, hp:24, speed:3.1, damage:23, fireRate:2.9, range:57, points:255, scale:0.92 },
+
+  // ── 第五梯队：特殊/异形 (多色系) ──
+  medic:      { name:'医疗兵',   color:0xddeeff, hp:35, speed:4.5, damage:0,  fireRate:999,range:30, points:200, scale:0.9 },
+  shield:     { name:'重盾兵',   color:0x667788, hp:75, speed:2.8, damage:10, fireRate:1.8, range:22, points:350, scale:1.25 },
+  bomber:     { name:'自爆兵',   color:0xccaa00, hp:15, speed:9,   damage:30, fireRate:999,range:8,  points:180, scale:0.8 },
+  ghost:      { name:'幽灵',     color:0x88ccdd, hp:28, speed:5,   damage:20, fireRate:1.8, range:18, points:280, scale:0.9 },
+  turret:     { name:'炮塔',     color:0x555555, hp:40, speed:0,   damage:10, fireRate:0.4, range:40, points:200, scale:1.0 },
+  pyromancer: { name:'炎术师',   color:0xff4400, hp:32, speed:4,   damage:18, fireRate:1.2, range:28, points:260, scale:1.0 },
+  cryomancer: { name:'冰术师',   color:0x44aaff, hp:34, speed:3.5, damage:16, fireRate:1.4, range:30, points:250, scale:1.0 },
+  necromancer:{ name:'亡灵师',   color:0x664488, hp:38, speed:3,   damage:14, fireRate:1.6, range:32, points:270, scale:1.05 },
+  technomancer:{ name:'机械师',  color:0x888888, hp:45, speed:2.5, damage:12, fireRate:0.8, range:35, points:300, scale:1.1 },
+  hellion:    { name:'地狱兵',   color:0xcc2222, hp:50, speed:5,   damage:25, fireRate:1.5, range:26, points:350, scale:1.15 },
+}
 
 // ==================== DOM元素 ====================
 const scoreEl = document.getElementById('score');
@@ -1605,30 +1655,28 @@ function startWave(num) {
   waveActive = true;
   spawnQueue = [];
 
-  // 波次定义：逐波引入新兵种，而非堆数量
-  const waveDefs = [
-    { grunt: 4, runner: 0, tank: 0, sniper: 0, medic: 0, shield: 0, bomber: 0, ghost: 0, turret: 0 },  // 1
-    { grunt: 5, runner: 2, tank: 0, sniper: 0, medic: 0, shield: 0, bomber: 0, ghost: 0, turret: 0 },  // 2
-    { grunt: 4, runner: 4, tank: 0, sniper: 0, medic: 0, shield: 0, bomber: 0, ghost: 0, turret: 0 },  // 3
-    { grunt: 3, runner: 3, tank: 1, sniper: 0, medic: 0, shield: 0, bomber: 0, ghost: 0, turret: 0 },  // 4
-    { grunt: 4, runner: 2, tank: 2, sniper: 0, medic: 0, shield: 0, bomber: 0, ghost: 0, turret: 0 },  // 5
-    { grunt: 3, runner: 2, tank: 1, sniper: 2, medic: 0, shield: 0, bomber: 0, ghost: 0, turret: 0 },  // 6
-    { grunt: 2, runner: 2, tank: 2, sniper: 2, medic: 0, shield: 0, bomber: 0, ghost: 0, turret: 0 },  // 7
-    { grunt: 2, runner: 1, tank: 1, sniper: 2, medic: 2, shield: 0, bomber: 0, ghost: 0, turret: 0 },  // 8
-    { grunt: 1, runner: 2, tank: 1, sniper: 2, medic: 2, shield: 1, bomber: 2, ghost: 0, turret: 0 },  // 9 +自爆兵
-    { grunt: 1, runner: 2, tank: 2, sniper: 2, medic: 2, shield: 1, bomber: 2, ghost: 1, turret: 1 },  // 10 +幽灵+炮塔
-    { grunt: 0, runner: 2, tank: 2, sniper: 3, medic: 2, shield: 2, bomber: 3, ghost: 1, turret: 1 },  // 11
-    { grunt: 0, runner: 1, tank: 2, sniper: 3, medic: 2, shield: 2, bomber: 3, ghost: 2, turret: 2 },  // 12+
-  ];
+  // 50种兵种按梯队分组，逐波解锁
+  const allKeys = Object.keys(ENEMY_TYPES);
+  const t1 = allKeys.slice(0, 10);   // 基础步兵
+  const t2 = allKeys.slice(10, 20);  // 高速兵种
+  const t3 = allKeys.slice(20, 30);  // 重装坦克
+  const t4 = allKeys.slice(30, 40);  // 远程狙击
+  const t5 = allKeys.slice(40, 50);  // 特殊异形
 
-  const def = waveDefs[Math.min(num - 1, waveDefs.length - 1)];
-  for (const [type, count] of Object.entries(def)) {
-    for (let i = 0; i < count; i++) {
-      spawnQueue.push(type);
-    }
-  }
+  function pick(arr, n) { const s = [...arr].sort(()=>Math.random()-0.5); return s.slice(0, n); }
 
-  // 打乱生成顺序
+  let pool = [];
+  if (num >= 1) pool = pool.concat(pick(t1, Math.min(6, t1.length)));
+  if (num >= 3) pool = pool.concat(pick(t2, Math.min(4, t2.length)));
+  if (num >= 5) pool = pool.concat(pick(t3, Math.min(2, t3.length)));
+  if (num >= 7) pool = pool.concat(pick(t4, Math.min(3, t4.length)));
+  if (num >= 9) pool = pool.concat(pick(t5, Math.min(2, t5.length)));
+  if (num >= 12) pool = pool.concat(pick([...t4, ...t5], Math.min(5, t4.length + t5.length)));
+
+  const count = Math.min(5 + num * 2, pool.length);
+  const picks = pick([...new Set(pool)], count);
+  for (const type of picks) spawnQueue.push(type);
+
   for (let i = spawnQueue.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [spawnQueue[i], spawnQueue[j]] = [spawnQueue[j], spawnQueue[i]];
@@ -1636,7 +1684,7 @@ function startWave(num) {
 
   enemiesRemaining = spawnQueue.length;
   spawnTimer = 0;
-  spawnInterval = Math.max(0.3, 0.8 - Math.min(num, 10) * 0.05);
+  spawnInterval = Math.max(0.25, 0.7 - Math.min(num, 15) * 0.03);
 
   updateUI();
   sfxWaveStart();
