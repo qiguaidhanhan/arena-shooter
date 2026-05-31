@@ -231,7 +231,7 @@
     <div class="abil-slot ult" id="abil-x"><div class="abil-fill"></div><span class="abil-key">X</span><span class="abil-label">0</span></div>
   </div>
 
-  <div id="weapon-indicator">💀 爆弹枪</div>
+  <div id="weapon-indicator">🔫 手枪</div>
 
   <div id="ammo-display">
     <span class="current" id="ammo-current">30</span>
@@ -245,8 +245,8 @@
   <canvas id="minimap" width="180" height="180"></canvas>
 
   <div id="start-screen">
-    <div class="title">💀 帝皇之怒</div>
-    <div class="subtitle">THE EMPEROR'S FURY · 战锤 40K</div>
+    <div class="title">竞技场射手</div>
+    <div class="subtitle">ARENA SHOOTER 3D</div>
     <div style="display:flex; gap:16px; margin-bottom:10px;">
       <button id="start-btn" style="font-size:18px; padding:14px 36px;">单人游戏</button>
       <button id="host-btn" style="font-size:18px; padding:14px 36px; background:linear-gradient(135deg,#4488ff,#2266cc); box-shadow:0 4px 15px rgba(0,100,255,0.4);">创建房间</button>
@@ -630,115 +630,135 @@ function triggerMuzzleFlash() {
   if (flashSprite) flashSprite.material.opacity = 1;
 }
 
-// ==================== 爆弹枪 (Bolter) ====================
+// ==================== 武器模型 (第一人称) ====================
 const gunGroup = new THREE.Group();
 
-const bRed = new THREE.MeshStandardMaterial({ color: 0x8b1a1a, roughness: 0.3, metalness: 0.5 });
-const bGold = new THREE.MeshStandardMaterial({ color: 0xc9a84c, roughness: 0.2, metalness: 0.9 });
-const bSteel = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.1, metalness: 0.95 });
-const bDark = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.3, metalness: 0.7 });
-const bGrip = new THREE.MeshStandardMaterial({ color: 0x2a1a0a, roughness: 0.6 });
+const gSlide = new THREE.MeshStandardMaterial({ color: 0x393939, roughness: 0.12, metalness: 0.95 });
+const gFrame = new THREE.MeshStandardMaterial({ color: 0x1c1c1c, roughness: 0.35, metalness: 0.06 });
+const gSteel = new THREE.MeshStandardMaterial({ color: 0x252525, roughness: 0.08, metalness: 0.98 });
+const gDark = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.3, metalness: 0.7 });
+const gGrip = new THREE.MeshStandardMaterial({ color: 0x332419, roughness: 0.55 });
 
-// 枪管——粗大厚实
-const gunBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.024, 0.4, 8), bSteel);
-gunBarrel.rotation.x = Math.PI / 2; gunBarrel.position.set(0, 0.03, -0.32); gunGroup.add(gunBarrel);
-// 枪口制退器
-const muzzle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.04, 0.06), bDark);
-muzzle.position.set(0, 0.03, -0.52); gunGroup.add(muzzle);
+// 枪管——Z轴前伸
+const gunBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.016, 0.34, 10), gSteel);
+gunBarrel.rotation.x = Math.PI / 2; gunBarrel.position.set(0, 0.03, -0.30); gunGroup.add(gunBarrel);
 
-// 枪身——大块红色装甲
-const body = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.07, 0.32), bRed);
-body.position.set(0, 0.03, -0.16); gunGroup.add(body);
-// 金色镶边（上下两条）
-const trimT = new THREE.Mesh(new THREE.BoxGeometry(0.082, 0.008, 0.33), bGold);
-trimT.position.set(0, 0.07, -0.16); gunGroup.add(trimT);
-const trimB = new THREE.Mesh(new THREE.BoxGeometry(0.082, 0.008, 0.33), bGold);
-trimB.position.set(0, -0.01, -0.16); gunGroup.add(trimB);
+// 滑套——一块长方体（简化，不分段）
+const slide = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.045, 0.36), gSlide);
+slide.position.set(0, 0.05, -0.18); gunGroup.add(slide);
+// 退壳口（滑套顶面方形凹槽）
+const eject = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.01, 0.07), gDark);
+eject.position.set(0, 0.058, -0.14); gunGroup.add(eject);
+// 滑套后防滑纹
+for (let i = 0; i < 4; i++) {
+  const s = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.005, 0.004), gDark);
+  s.position.set(0, 0.073, -0.02 + i * 0.008); gunGroup.add(s);
+}
 
-// 帝国天鹰徽记（简化十字）
-const aquilaV = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.04, 0.004), bGold);
-aquilaV.position.set(0, 0.05, -0.08); gunGroup.add(aquilaV);
-const aquilaH = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.01, 0.004), bGold);
-aquilaH.position.set(0, 0.06, -0.08); gunGroup.add(aquilaH);
+// 枪身框架——滑套下方
+const frame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.18), gFrame);
+frame.position.set(0, -0.008, -0.07); gunGroup.add(frame);
 
-// 弹匣——大号.75口径
-const mag = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.12, 0.06), bDark);
-mag.position.set(0, -0.06, -0.02); gunGroup.add(mag);
-const magLip = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.015, 0.065), bSteel);
-magLip.position.set(0, 0.0, -0.02); gunGroup.add(magLip);
+// 握把——后下方倾斜
+const grip = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.15, 0.065), gGrip);
+grip.position.set(0, -0.12, 0.04); grip.rotation.x = 0.22; gunGroup.add(grip);
 
-// 握把
-const grip = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.14, 0.06), bGrip);
-grip.position.set(0, -0.16, 0.04); grip.rotation.x = 0.2; gunGroup.add(grip);
-// 金色握把底座
-const gripBase = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.015, 0.07), bGold);
-gripBase.position.set(0, -0.08, 0.0); gunGroup.add(gripBase);
+// 弹匣——从握把向下伸出
+const mag = new THREE.Mesh(new THREE.BoxGeometry(0.036, 0.10, 0.045), gDark);
+mag.position.set(0, -0.15, 0.015); mag.rotation.x = 0.22; gunGroup.add(mag);
+const magFloor = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.012, 0.05), gFrame);
+magFloor.position.set(0, -0.20, 0.04); gunGroup.add(magFloor);
 
-// 瞄准具
-const sight = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.025, 0.03), bDark);
-sight.position.set(0, 0.09, -0.12); gunGroup.add(sight);
-
+// 扳机护圈——用半圆环
+const guardArc = new THREE.Mesh(new THREE.TorusGeometry(0.026, 0.007, 6, 10, Math.PI), gFrame);
+guardArc.position.set(0, -0.02, 0.12); guardArc.rotation.z = Math.PI / 2; guardArc.rotation.y = Math.PI / 2; gunGroup.add(guardArc);
 // 扳机
-const trig = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.03, 6), bDark);
-trig.rotation.z = Math.PI / 2; trig.position.set(0, -0.02, 0.1); gunGroup.add(trig);
+const trig = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.028, 6), gDark);
+trig.rotation.z = Math.PI / 2; trig.position.set(0, -0.015, 0.11); gunGroup.add(trig);
 
-gunGroup.position.set(0.32, -0.24, -0.55);
+// 准星 / 照门
+const fSight = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.022, 0.014), gDark);
+fSight.position.set(0, 0.08, -0.36); gunGroup.add(fSight);
+const rSight = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.012, 0.04), gDark);
+rSight.position.set(0, 0.075, -0.06); gunGroup.add(rSight);
+
+// 击锤
+const hammerG = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.012, 0.03), gDark);
+hammerG.position.set(0, 0.04, 0.07); gunGroup.add(hammerG);
+
+gunGroup.position.set(0.30, -0.24, -0.55);
 camera.add(gunGroup);
 
+// 枪口火焰精灵
 const flashSpriteMat = new THREE.SpriteMaterial({ map: flashTexture, blending: THREE.AdditiveBlending, transparent: true, opacity: 0, depthTest: false, depthWrite: false });
 flashSprite = new THREE.Sprite(flashSpriteMat);
-flashSprite.scale.set(0.4, 0.4, 1);
-flashSprite.position.set(0, 0.03, -0.55);
+flashSprite.scale.set(0.3, 0.3, 1);
+flashSprite.position.set(0, 0.03, -0.47);
 gunGroup.add(flashSprite);
 
-// ==================== 链锯剑 (Chainsword) ====================
+// ==================== 匕首模型 (第一人称) ====================
 const knifeGroup = new THREE.Group();
 
-const cSteel = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.1, metalness: 0.95 });
-const cDark = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.3, metalness: 0.8 });
-const cRed = new THREE.MeshStandardMaterial({ color: 0x8b1a1a, roughness: 0.3, metalness: 0.5 });
-const cGold = new THREE.MeshStandardMaterial({ color: 0xc9a84c, roughness: 0.2, metalness: 0.9 });
+const kSteel = new THREE.MeshStandardMaterial({ color: 0xd0d0d8, roughness: 0.08, metalness: 0.98 });
+const kDark = new THREE.MeshStandardMaterial({ color: 0x3a3028, roughness: 0.5 });
+const kGuardMetal = new THREE.MeshStandardMaterial({ color: 0x888890, roughness: 0.25, metalness: 0.8 });
 
-// 链锯刃——带锯齿的宽刃
-const bladeBody = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.16, 0.06), cSteel);
-bladeBody.position.y = 0.1; knifeGroup.add(bladeBody);
-// 锯齿（两侧小方块排列）
-for (let i = 0; i < 7; i++) {
-  const tooth = new THREE.Mesh(new THREE.BoxGeometry(0.006, 0.012, 0.008), cDark);
-  tooth.position.set(0.016, 0.03 + i * 0.022, 0); knifeGroup.add(tooth);
-  const tooth2 = new THREE.Mesh(new THREE.BoxGeometry(0.006, 0.012, 0.008), cDark);
-  tooth2.position.set(-0.016, 0.03 + i * 0.022, 0); knifeGroup.add(tooth2);
+// 刀身 —— Tanto 几何：梯形截面（下宽上窄）
+const bladeBase = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.09, 0.045), kSteel);
+bladeBase.position.y = 0.09; knifeGroup.add(bladeBase);
+// 刀身中部 —— 渐窄
+const bladeMid = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.07, 0.04), kSteel);
+bladeMid.position.y = 0.16; knifeGroup.add(bladeMid);
+// 刀尖 —— Tanto 切角（三角锥）
+const bladeTipMain = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.03, 0.035), kSteel);
+bladeTipMain.position.set(0, 0.21, 0.003); knifeGroup.add(bladeTipMain);
+// Tanto 尖端的斜切角
+const bladeTipAngle = new THREE.Mesh(new THREE.ConeGeometry(0.01, 0.025, 4), kSteel);
+bladeTipAngle.position.y = 0.24; knifeGroup.add(bladeTipAngle);
+
+// 刀刃斜面（两条细条模拟开刃）
+const edgeL = new THREE.Mesh(new THREE.BoxGeometry(0.002, 0.18, 0.003), kSteel);
+edgeL.position.set(0.006, 0.14, 0.023); knifeGroup.add(edgeL);
+const edgeR = new THREE.Mesh(new THREE.BoxGeometry(0.002, 0.18, 0.003), kSteel);
+edgeR.position.set(-0.006, 0.14, 0.023); knifeGroup.add(edgeR);
+
+// 血槽（刀身中央的凹线）
+const fuller = new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.13, 0.002), kDark);
+fuller.position.set(0, 0.13, 0.024); knifeGroup.add(fuller);
+
+// 护手 —— 弧形双翼
+const guardCenter = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.015, 0.04), kGuardMetal);
+guardCenter.position.y = 0.04; knifeGroup.add(guardCenter);
+const guardUp = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.07, 6), kGuardMetal);
+guardUp.rotation.z = Math.PI / 2; guardUp.position.set(0, 0.045, -0.005); knifeGroup.add(guardUp);
+// 护手指环
+const fingerRing = new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.005, 6, 12), kGuardMetal);
+fingerRing.position.set(0, 0.035, 0.025); knifeGroup.add(fingerRing);
+
+// 刀柄 —— 分段圆柱模拟握持轮廓
+const gripPts = [
+  { y: -0.02, rTop: 0.016, rBot: 0.017 },
+  { y: -0.06, rTop: 0.017, rBot: 0.018 },
+  { y: -0.10, rTop: 0.018, rBot: 0.017 },
+  { y: -0.14, rTop: 0.017, rBot: 0.015 },
+];
+gripPts.forEach(pt => {
+  const seg = new THREE.Mesh(new THREE.CylinderGeometry(pt.rTop, pt.rBot, 0.04, 8), kDark);
+  seg.position.y = pt.y; knifeGroup.add(seg);
+});
+// 刀柄缠绳纹（细环）
+for (let i = 0; i < 5; i++) {
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.019, 0.003, 4, 8), kGuardMetal);
+  ring.position.y = -0.04 - i * 0.025; knifeGroup.add(ring);
 }
-// 刀尖
-const tip = new THREE.Mesh(new THREE.ConeGeometry(0.015, 0.04, 4), cSteel);
-tip.position.y = 0.2; knifeGroup.add(tip);
 
-// 引擎外壳——红色装甲
-const engine = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, 0.07), cRed);
-engine.position.y = -0.04; knifeGroup.add(engine);
-// 金色镶边
-const eTrim = new THREE.Mesh(new THREE.BoxGeometry(0.042, 0.008, 0.072), cGold);
-eTrim.position.y = 0.0; knifeGroup.add(eTrim);
-// 排气孔
-for (let e = 0; e < 3; e++) {
-  const vent = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.01, 8), cDark);
-  vent.rotation.x = Math.PI / 2; vent.position.set(0, -0.02 - e * 0.018, 0.04); knifeGroup.add(vent);
-}
+// 柄尾金属（带挂绳孔）
+const pommel = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.016, 0.03, 8), kGuardMetal);
+pommel.position.y = -0.16; knifeGroup.add(pommel);
+const lanyardRing = new THREE.Mesh(new THREE.TorusGeometry(0.01, 0.004, 4, 8), kGuardMetal);
+lanyardRing.position.y = -0.16; knifeGroup.add(lanyardRing);
 
-// 护手
-const guard = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.015, 0.05), cGold);
-guard.position.y = 0.02; knifeGroup.add(guard);
-
-// 握柄
-for (let i = 0; i < 4; i++) {
-  const seg = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.014, 0.03, 8), cDark);
-  seg.position.y = -0.08 - i * 0.03; knifeGroup.add(seg);
-}
-// 柄尾
-const pommel2 = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, 0.025, 8), cGold);
-pommel2.position.y = -0.21; knifeGroup.add(pommel2);
-
-knifeGroup.position.set(0.24, -0.46, -0.42);
+knifeGroup.position.set(0.22, -0.48, -0.42);
 knifeGroup.rotation.x = -0.3;
 knifeGroup.visible = false;
 camera.add(knifeGroup);
@@ -754,10 +774,10 @@ let switchTarget = 0;
 let knifeAttackTimer = 0;
 let knifeStabPhase = 0;    // 0=idle, >0=stabbing
 
-const GUN_POS_ACTIVE  = { x: 0.32, y: -0.24, z: -0.55 };
-const GUN_POS_HIDDEN  = { x: 0.32, y: -0.48, z: -0.38 };
-const KNIFE_POS_ACTIVE = { x: 0.24, y: -0.30, z: -0.42 };
-const KNIFE_POS_HIDDEN = { x: 0.24, y: -0.52, z: -0.32 };
+const GUN_POS_ACTIVE  = { x: 0.30, y: -0.24, z: -0.55 };
+const GUN_POS_HIDDEN  = { x: 0.30, y: -0.48, z: -0.38 };
+const KNIFE_POS_ACTIVE = { x: 0.22, y: -0.30, z: -0.42 };
+const KNIFE_POS_HIDDEN = { x: 0.22, y: -0.52, z: -0.32 };
 
 function switchWeapon(target) {
   if (currentWeapon === target || switchProgress !== switchTarget) return;
@@ -1116,17 +1136,12 @@ function createEnemyMesh(type) {
   const absGeo = new THREE.BoxGeometry(0.4 * s, 0.2 * s, 0.28 * s);
   const abs = new THREE.Mesh(absGeo, armorMat); abs.position.y = 0.8 * s; abs.castShadow = true; g.add(abs);
 
-  // 战锤40K大肩甲（半球+金色镶边）
-  const pauldronGeo = new THREE.SphereGeometry(0.18 * s, 8, 6, 0, Math.PI * 2, 0, Math.PI * 0.65);
-  const goldTrim = new THREE.MeshStandardMaterial({ color: 0xc9a84c, roughness: 0.2, metalness: 0.9 });
+  // 肩甲
+  const shoulderGeo = new THREE.SphereGeometry(0.13 * s, 6, 6);
   [
-    [-0.38 * s, 1.35 * s, 0.03 * s], [0.38 * s, 1.35 * s, 0.03 * s]
-  ].forEach(([sx, sy, sz]) => {
-    const pauldron = new THREE.Mesh(pauldronGeo, armorMat);
-    pauldron.position.set(sx, sy, sz); pauldron.castShadow = true; g.add(pauldron);
-    // 金色镶边
-    const trimRing = new THREE.Mesh(new THREE.TorusGeometry(0.17 * s, 0.015 * s, 6, 12), goldTrim);
-    trimRing.position.set(sx, sy + 0.04 * s, sz); trimRing.rotation.x = Math.PI / 2; g.add(trimRing);
+    [-0.35 * s, 1.38 * s], [0.35 * s, 1.38 * s]
+  ].forEach(([sx, sy]) => {
+    const shoulder = new THREE.Mesh(shoulderGeo, armorMat); shoulder.position.set(sx, sy, 0); shoulder.castShadow = true; g.add(shoulder);
   });
 
   // 手臂（上臂圆柱 + 前臂圆柱 + 手）
@@ -1673,7 +1688,7 @@ function startWave(num) {
 
   updateUI();
   sfxWaveStart();
-  showScreenMsg(`✠ 第 ${num} 波 · 净化异端！`, '#ffcc00');
+  showScreenMsg(`第 ${num} 波 开始！`, '#ffcc00');
   if (isMultiplayer && isHost) {
     sendNetMessage({ type: 'wave_start', wave: num });
   }
@@ -1683,7 +1698,7 @@ function checkWaveComplete() {
   if (!waveActive) return;
   if (spawnQueue.length === 0 && enemiesRemaining <= 0) {
     waveActive = false;
-    showScreenMsg(`💀 异端已净化！第 ${waveNumber} 波`, '#ffcc00');
+    showScreenMsg(`第 ${waveNumber} 波 完成！`, '#00ff44');
     setTimeout(() => {
       if (player.health > 0) {
         startWave(waveNumber + 1);
@@ -2332,7 +2347,7 @@ function shoot() {
         const dmg = isHeadshot ? BULLET_DAMAGE * HEADSHOT_MULTIPLIER : BULLET_DAMAGE;
         if (isHeadshot) {
           spawnParticles(hitPoint, 0xffff00, 20, 8, 0.6);
-          addKillMessage('💀 爆头处决!', 0);
+          addKillMessage('💀爆头!', 0);
         } else {
           spawnParticles(hitPoint, 0xff4444, 10, 5, 0.4);
         }
@@ -2345,7 +2360,7 @@ function shoot() {
         const dmg = isHeadshot ? BULLET_DAMAGE * HEADSHOT_MULTIPLIER : BULLET_DAMAGE;
         if (isHeadshot) {
           spawnParticles(hitPoint, 0xffff00, 20, 8, 0.6);
-          addKillMessage('💀 爆头处决!', 0);
+          addKillMessage('💀爆头!', 0);
         } else {
           spawnParticles(hitPoint, 0xff4444, 10, 5, 0.4);
         }
@@ -2377,8 +2392,8 @@ function shoot() {
 }
 
 let reloadAnimProgress = 0;
-const GUN_POS_IDLE = { x: 0.32, y: -0.24, z: -0.55 };
-const GUN_POS_RELOAD = { x: 0.32, y: -0.42, z: -0.38 };
+const GUN_POS_IDLE = { x: 0.30, y: -0.24, z: -0.55 };
+const GUN_POS_RELOAD = { x: 0.30, y: -0.42, z: -0.38 };
 const GUN_ROT_RELOAD = 0.6;
 
 function knifeAttack() {
@@ -2498,7 +2513,7 @@ function updateUI() {
 
   const weaponEl = document.getElementById('weapon-indicator');
   if (weaponEl) {
-    weaponEl.textContent = currentWeapon === 'knife' ? '⛓️ 链锯剑' : '💀 爆弹枪';
+    weaponEl.textContent = currentWeapon === 'knife' ? '🔪 匕首' : '🔫 手枪';
   }
 }
 
